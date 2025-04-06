@@ -2,3 +2,5 @@ streamlit
 scikit-learn
 nltk
 pandas
+sentence-transformers
+beautifulsoup4
