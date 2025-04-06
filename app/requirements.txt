@@ -1,0 +1,8 @@
+streamlit
+scikit-learn
+nltk
+pandas
+sentence-transformers==2.2.2
+transformers==4.36.2
+torch>=1.10
+beautifulsoup4

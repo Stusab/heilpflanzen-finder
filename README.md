@@ -24,6 +24,10 @@ heilpflanzen-finder/
 ├── test_bs4.py                    # (Optional) BeautifulSoup Test
 ├── scrapy.cfg                     # (Optional) Scrapy-Konfiguration
 ```
+## 📌 Versionierung
+
+Aktuelle Version: `1.0.0`  
+Änderungen siehe [CHANGELOG.md](./CHANGELOG.md)
 
 ---
 

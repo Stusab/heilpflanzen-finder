@@ -28,12 +28,7 @@ jobs:
       run: |
         python -m unittest discover -s . -p 'test_*.py'
 
-    - name: 🏷️ Version aus Datei extrahieren
-      id: version
-      run: |
-        echo "VERSION=$(python -c 'exec(open(\"version.py\").read()); print(__version__)')" >> $GITHUB_ENV
-
-    - name: 🚣️ Docker Buildx Setup
+    - name: 🛣️ Docker Buildx Setup
       uses: docker/setup-buildx-action@v3
 
     - name: 🔐 Login DockerHub
@@ -47,6 +42,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: |
-              stusab/heilpflanzen-app:latest
-              stusab/heilpflanzen-app:${{ env.VERSION }}
+        tags: ${{ secrets.DOCKER_USERNAME }}/heilpflanzen-app:latest

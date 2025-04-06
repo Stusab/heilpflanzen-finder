@@ -1,9 +1,17 @@
 import json
 import time
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from pymongo import MongoClient
+
+# 🔐 MONGO_URI aus Umgebungsvariable lesen
+mongo_uri = os.getenv("MONGO_URI")
+client = MongoClient(mongo_uri)
+db = client["heilpflanzen"]
+collection = db["symptome"]
 
 # Lade die JSON-Datei mit fehlenden Symptomen
 with open("heilpflanzen_ohne_symptome.json", encoding="utf-8") as f:
@@ -25,13 +33,10 @@ for eintrag in eintraege:
         driver.get(url)
         time.sleep(2)
 
-        # XPath: finde das <li>, das "Anwendungsgebiete" enthält
         elemente = driver.find_elements(By.XPATH, '//li[contains(text(), "Anwendungsgebiete")]')
-
         for el in elemente:
             symptome.append(el.text.strip())
 
-        # Versuche, nachfolgende <li>-Elemente ebenfalls zu bekommen
         folge_elemente = driver.find_elements(By.XPATH, '//li[contains(text(), "Anwendungsgebiete")]/following-sibling::li[position() <= 2]')
         for el in folge_elemente:
             symptome.append(el.text.strip())
@@ -43,16 +48,14 @@ for eintrag in eintraege:
     except Exception as e:
         symptome = [f"Fehler: {str(e)}"]
 
-    ergebnisse.append({
+    dokument = {
         "name": name,
         "url": url,
         "symptome": symptome
-    })
+    }
+    ergebnisse.append(dokument)
+    collection.insert_one(dokument)
 
 driver.quit()
 
-# Ergebnisse speichern
-with open("heilpflanzen_symptome_selenium.json", "w", encoding="utf-8") as f:
-    json.dump(ergebnisse, f, ensure_ascii=False, indent=2)
-
-print("✅ Fertig! Ergebnisse in heilpflanzen_symptome_selenium.json gespeichert.")
+print("✅ Fertig! Ergebnisse gespeichert in MongoDB.")
