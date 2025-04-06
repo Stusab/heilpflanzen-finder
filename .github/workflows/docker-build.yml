@@ -1,0 +1,45 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main  # alternativ: master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📅 Repository klonen
+      uses: actions/checkout@v3
+
+    - name: 🐍 Python installieren
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: 🧪 Abhängigkeiten installieren
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: ✅ Modultest ausführen
+      run: |
+        python -m unittest discover -s . -p 'test_*.py'
+
+    - name: 🛣️ Docker Buildx Setup
+      uses: docker/setup-buildx-action@v3
+
+    - name: 🔐 Login DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: 🚰 Build und Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/heilpflanzen-app:latest
